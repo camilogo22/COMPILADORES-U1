@@ -16,6 +16,9 @@ class Lexer:
         ('END',       r';'),             # Fin de instrucción
         ('ID',        r'[A-Za-z_]\w*'),  # Identificadores
         ('OP',        r'[+\-*/]'),       # Operadores aritméticos
+        ('LPAREN',    r'\('),            # Paréntesis izquierdo
+        ('RPAREN',    r'\)'),            # Paréntesis derecho
+        ('STRING',    r'"([^"\\]*(\\.[^"\\]*)*)?"'),  # Cadenas entre comillas
         ('NEWLINE',   r'\n'),            # Nuevas líneas
         ('SKIP',      r'[ \t]+'),        # Espacios y tabulaciones
         ('COMMENT',   r'#.*'),           # Comentarios
@@ -95,9 +98,11 @@ class Parser:
     def term(self):
         if self.match('NUMBER'):
             return Node(self.previous().value)
+        elif self.match('STRING'):
+            return Node(self.previous().value)
         elif self.match('ID'):
             return Node(self.previous().value)
-        self.error("Expected a number or identifier")
+        self.error("Expected a number, string, or identifier")
 
     def match(self, token_type):
         if self.pos < len(self.tokens) and self.tokens[self.pos].token_type == token_type:
